@@ -1,0 +1,56 @@
+/* custom-theme.css */
+
+.text-primary-custom {
+  color: #64154a !important;
+}
+
+.background-primary-custom {
+  background-color: #64154a !important;
+  border-color: #64154a !important;
+}
+
+.text-dark-custom {
+  color: #8c3f6d !important;
+}
+
+.dropdown-menu-custom {
+  background-color: #f9eff4 !important;
+  border-color: #c4739d !important;
+}
+
+.dropdown-menu-custom .dropdown-item:hover {
+  background-color: #c4739d !important;
+  color: #fff !important;
+}
+
+.header-info span {
+  color: #64154a !important;
+}
+
+.nav-link {
+  transition: color 0.2s ease-in-out;
+}
+
+.dropdown-menu {
+  background-color: #f9eff4;
+}
+
+.dropdown-item.active,
+.dropdown-item:active,
+.dropdown-item:hover {
+  background-color: #c4739d;
+  color: white !important;
+}
+
+.dropdown-hover-item {
+  color: #333;
+  font-weight: 400;
+  padding: 6px 12px;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-hover-item:hover {
+  background-color: #c4739d;
+  color: white !important;
+  font-weight: 600;
+}
