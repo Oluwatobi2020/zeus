@@ -125,6 +125,7 @@ import Agent from "./components/Agent/Agent";
 import Settings from "./components/Settings/Settings";
 import Ticket from "./components/Ticket/Ticket";
 import TicketChat from "./components/Ticket/TicketChat";
+import { ChatProvider } from "../context/ChatContext";
 
 const Markup = () => {
   const allroutes = [
@@ -231,7 +232,7 @@ const Markup = () => {
     }
   }
   return (
-    <>
+    <ChatProvider>
       <Routes>
         <Route path="/page-lock-screen" element={<LockScreen />} />
         <Route path="/page-error-400" element={<Error400 />} />
@@ -265,7 +266,7 @@ const Markup = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ScrollToTop />
-    </>
+    </ChatProvider>
   );
 };
 
