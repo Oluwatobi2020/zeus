@@ -1,8 +1,6 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { userID } from "../../../../context/ChatContext";
 import ReplyChat from "./ReplyChat";
 import SendChat from "./SendChat";
-import ChatInputField from "./ChatInputField";
 
 const ChatSection = ({
   avatar1,
@@ -14,8 +12,6 @@ const ChatSection = ({
   handleSend,
   setUserInput,
 }) => {
-  
-  console.log("messages", messages)
   return (
     <div className={`card chat dz-chat-history-box ${openMsg ? "" : "d-none"}`}>
       <div
@@ -23,17 +19,17 @@ const ChatSection = ({
         id="DZ_W_Contacts_Body3"
       >
         {messages?.map((msg, index) =>
-          msg.type === "send" ? (
+          msg?.from?.id === userID ? (
             <SendChat
               key={index}
-              content={msg.content}
-              chatRealTime={msg.chatTime}
+              content={msg.text}
+              chatRealTime={msg.timestamp}
             />
           ) : (
             <ReplyChat
               key={index}
-              content={msg.content}
-              chatRealTime={msg.chatTime}
+              content={msg.text}
+              chatRealTime={msg.timestamp}
             />
           )
         )}

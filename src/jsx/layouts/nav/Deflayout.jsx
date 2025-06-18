@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useReducer } from "react";
 import { Tab, Nav, Collapse, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // import SideBar from "./SideBar";
 import NavHeader2 from "./NavHeader2";
@@ -23,6 +23,7 @@ import LogoutMini from "./LogoutMini";
 import { MdEdit } from "react-icons/md";
 import { useLoader } from "../../../hooks/useLoader";
 import { RiChatNewLine } from "react-icons/ri";
+import { useChat } from "../../../context/ChatContext";
 
 const browserList = [
   { image: icon1, title: "Chrome", color: "warning", percent: "90%" },
@@ -71,7 +72,8 @@ const menuInitial = {
 const Deflayout = ({ title, onClick: ClickToAddEvent }) => {
   const [toggle, setToggle] = useState("");
   const onClick = (name) => setToggle(toggle === name ? "" : name);
-  const { startNewChat, resetChat, toggleOpenNewMsg } = useLoader();
+
+  const navigate = useNavigate();
 
   const [activeMenu, setActiveMenu] = useState(0);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -161,7 +163,7 @@ const Deflayout = ({ title, onClick: ClickToAddEvent }) => {
                 <div className="card">
                   <div className="card-header align-items-center">
                     <Button
-                      onClick={() => resetChat()}
+                      onClick={() => navigate("/home")}
                       size="small"
                       variant="light"
                       className="me-2"

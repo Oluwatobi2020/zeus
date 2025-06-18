@@ -9,8 +9,16 @@
   border-color: #64154a !important;
 }
 
+.custom-button{
+  background-color: #64154a !important;
+}
+
+.custom-button:hover {
+  background-color: #64154ada !important;
+}
+
 .text-dark-custom {
-  color: #8c3f6d !important;
+  color: #5e1641 !important;
 }
 
 .dropdown-menu-custom {

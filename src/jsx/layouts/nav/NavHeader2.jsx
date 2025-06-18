@@ -1,24 +1,16 @@
-import React, {  useContext } from "react";
-import { useDispatch , useSelector } from 'react-redux';
+import React, { useContext } from "react";
+
 import { Link } from "react-router-dom";
 
-import { navtoggle } from "../../../store/actions/AuthActions";
 import { ThemeContext } from "../../../context/ThemeContext";
 
 /// images
 import logo from "../../../images/logo-white.png";
 import logoText from "../../../images/logo-text-white.png";
 
-const NavHeader2 = ({openSidebar}) => {  
-  const {  openMenuToggle } = useContext(
-    ThemeContext
-  );
-    
-    const dispatch = useDispatch();
-    const sideMenu = useSelector(state => state.sideMenu);
-    const handleToogle = () => {
-      dispatch(navtoggle());
-    };
+const NavHeader2 = ({ openSidebar }) => {
+  const { openMenuToggle } = useContext(ThemeContext);
+
   return (
     <div className="nav-header">
       {/* <Link to="/dashboard" className="brand-logo">
@@ -27,20 +19,23 @@ const NavHeader2 = ({openSidebar}) => {
           <img className="brand-title" src={logoText} alt="" />
       </Link> */}
 
-      <div
+      {/* <div
         className="nav-control"
         onClick={() => {
-          handleToogle()
+          handleToogle();
           openMenuToggle();
         }}
       >
-        <div className={`hamburger ${sideMenu ? "is-active" : ""} ${openSidebar ? 'd-none': ''}`}
+        {/* <div
+          className={`hamburger  ${
+            openSidebar ? "d-none" : ""
+          }`}
         >
           <span className="line"></span>
           <span className="line"></span>
           <span className="line"></span>
-        </div>
-      </div>
+        </div> 
+      </div> */}
     </div>
   );
 };

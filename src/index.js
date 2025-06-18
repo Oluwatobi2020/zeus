@@ -7,17 +7,23 @@ import { Provider } from "react-redux";
 import { store } from "./store/store";
 import ThemeContext from "./context/ThemeContext";
 import { UiTriggersProvider } from "../src/context/UiTriggersContext";
+import { ChatProvider } from "./context/ChatContext";
+import { AuthProvider } from "./context/AuthContext";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
       <HashRouter basename="/">
-        <ThemeContext>
-          <UiTriggersProvider>
-            <App />
-          </UiTriggersProvider>
-        </ThemeContext>
+        <AuthProvider>
+          <ChatProvider>
+            <ThemeContext>
+              <UiTriggersProvider>
+                <App />
+              </UiTriggersProvider>
+            </ThemeContext>
+          </ChatProvider>
+        </AuthProvider>
       </HashRouter>
     </Provider>
   </React.StrictMode>

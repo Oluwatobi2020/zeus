@@ -125,6 +125,8 @@ import Agent from "./components/Agent/Agent";
 import Settings from "./components/Settings/Settings";
 import Ticket from "./components/Ticket/Ticket";
 import TicketChat from "./components/Ticket/TicketChat";
+import { ChatProvider } from "../context/ChatContext";
+import StartConversation from "./components/Home/Home";
 
 const Markup = () => {
   const allroutes = [
@@ -255,6 +257,7 @@ const Markup = () => {
         </Route>
 
         <Route path="/settings" element={<Settings />} />
+        <Route path="/home" element={<StartConversation />} />
 
         <Route path="ticket-management" element={<TicketManagementLayout />}>
           <Route index element={<TicketManagement />} />
@@ -283,7 +286,7 @@ function MainLayout() {
       <div className="content-body">
         <div
           className="container-fluid"
-          style={{ minHeight: window.screen.height - 45 }}
+          // style={{ minHeight: window.screen.height - 45 }}
         >
           <Outlet />
         </div>

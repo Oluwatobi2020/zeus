@@ -13,6 +13,7 @@ const ReplyChat = ({ content, chatRealTime }) => {
               fontStyle: "italic",
               color: "#E0DFDE",
               marginLeft: "0.5rem",
+              whiteSpace: "pre-line",
             }}
           >
             {`@${chatRealTime}`}
