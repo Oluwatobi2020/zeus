@@ -78,9 +78,9 @@ const Header = ({ onNote }) => {
                     Ticket Management
                   </NavLink>
                 </Nav.Item> */}
-                <Nav.Item>
+                {/* <Nav.Item>
                   <TicketManagementNavBar />
-                </Nav.Item>
+                </Nav.Item> */}
               </Nav>
             </div>
 
@@ -100,14 +100,14 @@ const Header = ({ onNote }) => {
                   </div>
                 </Dropdown.Toggle>
                 <Dropdown.Menu align="end" className="dropdown-menu-custom">
-                  <Link to="/settings" className="dropdown-item ai-icon">
+                  {/* <Link to="/settings" className="dropdown-item ai-icon">
                     <i className="fas fa-cog text-primary-custom me-2" />
                     Settings
-                  </Link>
-                  <Link to="/ticket-management" className="dropdown-item ai-icon">
+                  </Link> */}
+                  {/* <Link to="/ticket-management" className="dropdown-item ai-icon">
                     <i className="fas fa-inbox text-success me-2" />
                     Ticket Management
-                  </Link>
+                  </Link> */}
                   <LogoutPage />
                 </Dropdown.Menu>
               </Dropdown>

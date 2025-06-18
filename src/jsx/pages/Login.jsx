@@ -33,8 +33,9 @@ function Login(props) {
     if (error) {
       return;
     }
-    dispatch(loadingToggleAction(true));
-    dispatch(loginAction(email, password, Nav));
+    Nav("/home")
+    // dispatch(loadingToggleAction(true));
+    // dispatch(loginAction(email, password, Nav));
   }
 
   return (
@@ -121,11 +122,11 @@ function Login(props) {
   );
 }
 
-const mapStateToProps = (state) => {
-  return {
-    errorMessage: state.auth.errorMessage,
-    successMessage: state.auth.successMessage,
-    showLoading: state.auth.showLoading,
-  };
-};
-export default connect(mapStateToProps)(Login);
+// const mapStateToProps = (state) => {
+//   return {
+//     errorMessage: state.auth.errorMessage,
+//     successMessage: state.auth.successMessage,
+//     showLoading: state.auth.showLoading,
+//   };
+// };
+export default Login;
