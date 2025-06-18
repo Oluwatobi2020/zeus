@@ -12,9 +12,9 @@ export const AuthProvider = ({ children }) => {
         const response = await axios.post(
           "https://204.8.207.123/coralauth/api/authentication",
           {
-            username: "admin",
-            password: "Welcome123@",
-            appKey: "kelvinApp",
+            username: process.env.REACT_APP_AUTH_NAME,
+            password: process.env.REACT_APP_AUTH_PASSWORD,
+            appKey: process.env.REACT_APP_AUTH_APP_KEY,
           }
         );
 
