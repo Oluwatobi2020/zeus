@@ -1,11 +1,11 @@
 import axios from "axios";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ChartChartjs from "../jsx/components/charts/Chartjs";
 
 const authContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
+  const token = useRef("");
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -18,9 +18,9 @@ export const AuthProvider = ({ children }) => {
           }
         );
 
-        console.log("Axios response:", response.data);
+        token.current = response.data.activity;
       } catch (err) {
-        console.error("Axios error:", err.message);
+        console.error(" error:", err.message);
       }
     };
 
@@ -29,9 +29,27 @@ export const AuthProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
-  const authenticateUser = (email, password) => {
+  const authenticateUser = async (email, password) => {
     console.log(email, password);
-    navigate("/dashboard");
+
+    try {
+      const response = await axios.post(
+        "https://204.8.207.123/coralauth/api/onlineauth",
+        {
+          username: email,
+          password: password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token.current}`,
+          },
+        }
+      );
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Axios error:", error);
+    }
   };
 
   return (
