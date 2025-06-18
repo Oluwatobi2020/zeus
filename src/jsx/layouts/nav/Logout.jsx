@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 
 function withRouter(Component) {
   function ComponentWithRouterProp(props) {
@@ -34,10 +34,13 @@ function LogoutPage() {
           <polyline points="16 17 21 12 16 7" />
           <line x1={21} y1={12} x2={9} y2={12} />
         </svg>
-        <span className="ms-2">Logout </span>
+        <NavLink to="/login">
+          {/* <i className="fas fa-cog text-primary-custom me-2" /> */}
+          <span style={{marginLeft:"0.5rem"}}>Logout</span>
+        </NavLink>
       </button>
     </>
   );
 }
 
-export default withRouter(LogoutPage);
+export default LogoutPage;
