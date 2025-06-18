@@ -55,7 +55,7 @@ export function loginAction(email, password, navigate) {
                     navigate,
                 );
                dispatch(loginConfirmedAction(response.data));			              
-				navigate('/dashboard');                
+				navigate('/home');                
             })
             .catch((error) => {				
                 const errorMessage = formatError(error.response.data);

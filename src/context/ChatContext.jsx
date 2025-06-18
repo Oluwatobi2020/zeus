@@ -1,18 +1,27 @@
 import axios from "axios";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import { CHANNELS } from "../jsx/constant/channels";
 
 const chatContext = createContext(undefined);
 
-export const botID = "coralpaybot";
+export const userID = "user";
+
+const LIST_OF_MESSAGES = [
+  "Hey there! I’m Zeus ⚡️—your friendly transaction tracker. Let’s check that payment. Just send me your transaction ID and payment channel.",
+  "Welcome aboard! Zeus here. To get started, please drop your transaction ID and channel. I promise I won’t bite… unless you’re a packet. 🧾",
+  "Ah, a new traveler in the land of transactions! I'm Zeus. Give me a transaction ID and a payment channel, and I’ll do the digging.",
+  "Hello! I’m Zeus—here to check the status of your transaction, without the stress. All I need is your transaction ID and channel.",
+  "Greetings, mortal! Just kidding 😄. I’m Zeus. Toss me your transaction ID and payment channel, and I’ll check things faster than a lightning bolt ⚡.",
+];
+
+const randomMessageIndex = Math.floor(Math.random() * LIST_OF_MESSAGES.length);
 
 export const ChatProvider = ({ children }) => {
-  const [messages, setMessages] = useState([
-    {
-      text: "Welcome!, I'm Zeus, I'm here to help you check the status of your transaction. To get started, please provide your transaction ID and the payment channel",
-      timestamp: new Date(),
-      from: { id: botID },
-    },
-  ]);
+  const [searchParams] = useSearchParams();
+  const conversationType = searchParams.get("type");
+
+  const [messages, setMessages] = useState([]);
 
   const [isLoading, setIsLoading] = useState();
 
@@ -22,14 +31,29 @@ export const ChatProvider = ({ children }) => {
     expireTime: 3600,
   });
 
+  const selectedConversation =
+    CHANNELS.find((channel) => channel.slug === conversationType)?.slug || "";
+
   useEffect(() => {
-    startMessage();
+    if (selectedConversation) {
+      startConversationForDocumentation();
+    } else {
+      startConversation();
+    }
+
     const intervalID = setInterval(refreshToken, 3500 * 1000);
     return () => clearInterval(intervalID);
-  }, []);
+  }, [selectedConversation]);
 
-  const startMessage = async () => {
+  const startConversation = async () => {
     try {
+      setMessages([
+        {
+          text: LIST_OF_MESSAGES[randomMessageIndex],
+          timestamp: new Date(),
+          from: { id: "coralpaybot" },
+        },
+      ]);
       const res = await axios.post(
         `${process.env.REACT_APP_BACKEND_BASE_URL}/conversation`,
         {},
@@ -50,8 +74,36 @@ export const ChatProvider = ({ children }) => {
       console.log("Send Message Here => ", err);
     }
   };
+  const startConversationForDocumentation = async () => {
+    try {
+      setMessages([
+        {
+          text: "Welcome to Zeus API Document Assistant!",
+          timestamp: new Date(),
+          from: { id: "coralpaybot" },
+        },
+      ]);
+      const res = await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/conversation/ZeusDocumentAssistant`,
+        {},
+        {
+          headers: {
+            apiKey: process.env.REACT_APP_ZESUS_API_KEY,
+          },
+        }
+      );
 
-  console.log(process.env.REACT_APP_BACKEND_BASE_URL)
+      const { token, conversationId, expires_in } = res.data;
+
+      tokenInformation.current = {
+        token,
+        conversationId,
+        expireTime: expires_in * 1000,
+      };
+    } catch (err) {
+      console.log("Send Message Here => ", err);
+    }
+  };
 
   const refreshToken = async () => {
     try {
@@ -84,12 +136,15 @@ export const ChatProvider = ({ children }) => {
     try {
       setMessages((prev) => [...prev, message]);
       setIsLoading(true);
+
       const res = await axios.post(
         `${process.env.REACT_APP_BACKEND_BASE_URL}/message`,
         {
           type: "message",
-          from: { id: "user1" },
-          text: message.text,
+          from: { id: userID },
+          text:
+            (selectedConversation ? `#${selectedConversation}` : "") +
+            message.text,
           conversationId: tokenInformation.current.conversationId,
         },
         {
@@ -110,7 +165,15 @@ export const ChatProvider = ({ children }) => {
   };
 
   return (
-    <chatContext.Provider value={{ messages, sendMessage, isLoading }}>
+    <chatContext.Provider
+      value={{
+        messages,
+        sendMessage,
+        isLoading,
+        startConversation,
+        startConversationForDocumentation,
+      }}
+    >
       {children}
     </chatContext.Provider>
   );

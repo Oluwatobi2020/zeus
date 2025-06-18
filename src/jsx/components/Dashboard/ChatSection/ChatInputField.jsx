@@ -34,7 +34,10 @@ const ChatInputField = ({ userChats }) => {
         borderRadius: "20px 20px 20px 20px",
         width: "100%",
         padding: "10px",
-        marginTop: "auto"
+        marginTop: "auto",
+        marginBottom: "20px",
+        position: "absolute",
+        bottom: "10px"
       }}
     >
       <TextareaAutosize

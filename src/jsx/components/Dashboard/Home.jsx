@@ -44,11 +44,12 @@ function AllSection() {
   return (
     <section
       style={{
-        height: "80vh",
         width: "80%",
         margin: "0 auto",
-        display: "flex",
-        flexDirection: "column",
+        // display: "flex",
+        // flexDirection: "column",
+        height: "75vh",
+        position: "relative",
       }}
     >
       <div style={{ flex: 1 }}>

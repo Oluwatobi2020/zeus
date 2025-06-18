@@ -126,6 +126,7 @@ import Settings from "./components/Settings/Settings";
 import Ticket from "./components/Ticket/Ticket";
 import TicketChat from "./components/Ticket/TicketChat";
 import { ChatProvider } from "../context/ChatContext";
+import StartConversation from "./components/Home/Home";
 
 const Markup = () => {
   const allroutes = [
@@ -232,7 +233,7 @@ const Markup = () => {
     }
   }
   return (
-    <ChatProvider>
+    <>
       <Routes>
         <Route path="/page-lock-screen" element={<LockScreen />} />
         <Route path="/page-error-400" element={<Error400 />} />
@@ -256,6 +257,7 @@ const Markup = () => {
         </Route>
 
         <Route path="/settings" element={<Settings />} />
+        <Route path="/home" element={<StartConversation />} />
 
         <Route path="ticket-management" element={<TicketManagementLayout />}>
           <Route index element={<TicketManagement />} />
@@ -266,7 +268,7 @@ const Markup = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ScrollToTop />
-    </ChatProvider>
+    </>
   );
 };
 
@@ -284,7 +286,7 @@ function MainLayout() {
       <div className="content-body">
         <div
           className="container-fluid"
-          style={{ minHeight: window.screen.height - 45 }}
+          // style={{ minHeight: window.screen.height - 45 }}
         >
           <Outlet />
         </div>

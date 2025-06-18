@@ -1,5 +1,5 @@
-import React, {  useContext } from "react";
-import { useDispatch , useSelector } from 'react-redux';
+import React, { useContext } from "react";
+
 import { Link } from "react-router-dom";
 
 import { navtoggle } from "../../../store/actions/AuthActions";
@@ -9,38 +9,33 @@ import { ThemeContext } from "../../../context/ThemeContext";
 import logo from "../../../images/logo-white.png";
 import logoText from "../../../images/logo-text-white.png";
 
-const NavHader = () => {  
-  const { openMenuToggle } = useContext(
-    ThemeContext
-  );
+const NavHader = () => {
+  const { openMenuToggle } = useContext(ThemeContext);
+
+  const handleToogle = () => {
     
-    const dispatch = useDispatch();
-    const sideMenu = useSelector(state => state.sideMenu);
-    const handleToogle = () => {
-      dispatch(navtoggle());
-    };
+  };
   return (
     <div className="nav-header">
       <Link to="/dashboard" className="brand-logo">
-          <img className="logo-abbr" src={logo} alt="" />
-          <img className="logo-compact" src={logoText} alt="" />
-          <img className="brand-title" src={logoText} alt="" />
+        <img className="logo-abbr" src={logo} alt="" />
+        <img className="logo-compact" src={logoText} alt="" />
+        <img className="brand-title" src={logoText} alt="" />
       </Link>
 
-      <div
+      {/* <div
         className="nav-control"
         onClick={() => {
-          handleToogle()
+          handleToogle();
           openMenuToggle();
         }}
       >
-        <div className={`hamburger ${sideMenu ? "is-active" : ""}`}
-        >
+        <div className={`hamburger ${sideMenu ? "is-active" : ""}`}>
           <span className="line"></span>
           <span className="line"></span>
           <span className="line"></span>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

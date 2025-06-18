@@ -1,5 +1,6 @@
+import ReactMarkdown from "react-markdown";
 import { useEffect, useRef } from "react";
-import { botID, useChat } from "../../../../context/ChatContext";
+import { userID, useChat } from "../../../../context/ChatContext";
 
 function Messages({ messages }) {
   const scrollContainerRef = useRef();
@@ -16,26 +17,26 @@ function Messages({ messages }) {
   return (
     <div
       className="flex-grow-1 mb-3"
-      style={{ overflowY: "scroll", height: "70vh" }}
+      style={{ overflowY: "scroll", height: "57vh" }}
       ref={scrollContainerRef}
     >
       {messages.map((msg, idx) => {
-        const isBot = msg?.from?.id === botID;
+        const isUser = msg?.from?.id === userID;
 
         return (
           <div
             key={idx}
             className={`mb-3 mt-1 px-2 py-1 rounded border`}
             style={{
-              backgroundColor: !isBot ? "white" : "#f8f9fa",
+              backgroundColor: isUser ? "white" : "#f8f9fa",
               fontSize: "14px",
               wordBreak: "break-word",
               width: "max-content",
               maxWidth: "75%",
-              marginLeft: isBot ? "" : "auto",
+              marginLeft: isUser ? "auto": "",
             }}
           >
-            <p className="mb-1">{msg.text}</p>
+            <ReactMarkdown>{msg.text}</ReactMarkdown>
 
             <small className=" d-block text-end" style={{ fontSize: "11px" }}>
               {new Date(msg.timestamp).toLocaleTimeString([], {
