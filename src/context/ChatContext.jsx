@@ -1,5 +1,12 @@
 import axios from "axios";
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { useSearchParams } from "react-router-dom";
 import { CHANNELS } from "../jsx/constant/channels";
 
@@ -22,8 +29,7 @@ export const ChatProvider = ({ children }) => {
   const conversationType = searchParams.get("type");
 
   const [messages, setMessages] = useState([]);
-
-  const [isLoading, setIsLoading] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const tokenInformation = useRef({
     token: "",
@@ -31,11 +37,54 @@ export const ChatProvider = ({ children }) => {
     expireTime: 3600,
   });
 
-  const selectedConversation =
-    CHANNELS.find((channel) => channel.slug === conversationType)?.slug || "";
+  const selectedConversation = CHANNELS?.find(
+    (channel) => channel.slug === conversationType
+  );
+
+  const startConversationForDocumentation = useCallback(
+    async function startConversationForDocumentation() {
+      try {
+        setMessages([
+          {
+            text: `Welcome to Zeus API Document Assistant for ${selectedConversation?.name.toUpperCase()}!`,
+            timestamp: new Date(),
+            from: { id: "coralpaybot" },
+          },
+        ]);
+        const res = await axios.post(
+          `${process.env.REACT_APP_BACKEND_BASE_URL}/conversation/ZeusDocumentAssistant`,
+          {},
+          {
+            headers: {
+              apiKey: process.env.REACT_APP_ZESUS_API_KEY,
+            },
+          }
+        );
+
+        const { token, conversationId, expires_in } = res.data;
+
+        tokenInformation.current = {
+          token,
+          conversationId,
+          expireTime: expires_in * 1000,
+        };
+      } catch (err) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: generateErrorMessages(err),
+            timestamp: new Date(),
+            from: { id: "coralpaybot" },
+          },
+        ]);
+      }
+    },
+    [selectedConversation?.name]
+  );
 
   useEffect(() => {
     if (selectedConversation) {
+      console.log(selectedConversation.name)
       startConversationForDocumentation();
     } else {
       startConversation();
@@ -43,9 +92,9 @@ export const ChatProvider = ({ children }) => {
 
     const intervalID = setInterval(refreshToken, 3500 * 1000);
     return () => clearInterval(intervalID);
-  }, [selectedConversation]);
+  }, [selectedConversation, startConversationForDocumentation]);
 
-  const startConversation = async () => {
+  async function startConversation() {
     try {
       setMessages([
         {
@@ -71,39 +120,16 @@ export const ChatProvider = ({ children }) => {
         expireTime: expires_in * 1000,
       };
     } catch (err) {
-      console.log("Send Message Here => ", err);
-    }
-  };
-  const startConversationForDocumentation = async () => {
-    try {
-      setMessages([
+      setMessages((prev) => [
+        ...prev,
         {
-          text: "Welcome to Zeus API Document Assistant!",
+          text: generateErrorMessages(err),
           timestamp: new Date(),
           from: { id: "coralpaybot" },
         },
       ]);
-      const res = await axios.post(
-        `${process.env.REACT_APP_BACKEND_BASE_URL}/conversation/ZeusDocumentAssistant`,
-        {},
-        {
-          headers: {
-            apiKey: process.env.REACT_APP_ZESUS_API_KEY,
-          },
-        }
-      );
-
-      const { token, conversationId, expires_in } = res.data;
-
-      tokenInformation.current = {
-        token,
-        conversationId,
-        expireTime: expires_in * 1000,
-      };
-    } catch (err) {
-      console.log("Send Message Here => ", err);
     }
-  };
+  }
 
   const refreshToken = async () => {
     try {
@@ -128,7 +154,14 @@ export const ChatProvider = ({ children }) => {
         expireTime: expires_in * 1000,
       };
     } catch (err) {
-      console.log("Refresh Error Here => ", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: generateErrorMessages(err),
+          timestamp: new Date(),
+          from: { id: "coralpaybot" },
+        },
+      ]);
     }
   };
 
@@ -143,7 +176,7 @@ export const ChatProvider = ({ children }) => {
           type: "message",
           from: { id: userID },
           text:
-            (selectedConversation ? `#${selectedConversation}` : "") +
+            (selectedConversation ? `#${selectedConversation.slug}` : "") +
             message.text,
           conversationId: tokenInformation.current.conversationId,
         },
@@ -158,7 +191,14 @@ export const ChatProvider = ({ children }) => {
 
       setMessages((prev) => [...prev, res.data.activity]);
     } catch (err) {
-      console.log("Refresh Error Here => ", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: generateErrorMessages(err),
+          timestamp: new Date(),
+          from: { id: "coralpaybot" },
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -186,6 +226,37 @@ export const useChat = () => {
   }
   return context;
 };
+
+function generateErrorMessages(err) {
+  let errorMessage =
+    "Hmm... something unexpected just happened 🤔. Could you please prompt me again? Thank you! – Zeus";
+
+  if (axios.isAxiosError(err)) {
+    if (err.response) {
+      const status = err.response.status;
+
+      if (status === 401) {
+        errorMessage =
+          "Oops! You're not authorized to do that. Please log in and try again.";
+      } else if (status === 403) {
+        errorMessage = "Looks like you don’t have permission for this action.";
+      } else if (status === 404) {
+        errorMessage =
+          "Hmm... I couldn’t find that conversation. 🧐 Want to try again?";
+      } else if (status >= 500) {
+        errorMessage =
+          "Uh-oh! Something's up on our side. Let’s try again shortly. ⚙️";
+      } else if (err.response.data?.message) {
+        errorMessage = err.response.data.message + " – Zeus";
+      }
+    } else if (err.request) {
+      errorMessage =
+        "I'm having trouble reaching the server 🌐. Please check your connection and try again.";
+    }
+  }
+
+  return errorMessage;
+}
 
 // const fetchToken = async () => {
 //   try {

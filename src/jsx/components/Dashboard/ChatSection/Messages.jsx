@@ -17,7 +17,7 @@ function Messages({ messages }) {
   return (
     <div
       className="flex-grow-1 mb-3"
-      style={{ overflowY: "scroll", height: "57vh" }}
+      style={{ overflowY: "scroll", height: "57vh", minHeight: "57vh" }}
       ref={scrollContainerRef}
     >
       {messages.map((msg, idx) => {
@@ -33,7 +33,7 @@ function Messages({ messages }) {
               wordBreak: "break-word",
               width: "max-content",
               maxWidth: "75%",
-              marginLeft: isUser ? "auto": "",
+              marginLeft: isUser ? "auto" : "",
             }}
           >
             <ReactMarkdown>{msg.text}</ReactMarkdown>
