@@ -131,7 +131,7 @@ import Login from "./pages/Login";
 const Markup = () => {
   const allroutes = [
     /// Dashboard
-    { url: "", component: <StartConversation /> },
+    // { url: "", component: <StartConversation /> },
     { url: "dashboard", component: <Home /> },
     { url: "dashboard-dark", component: <DashboardDark /> },
 
@@ -227,7 +227,6 @@ const Markup = () => {
     let path = window.location.pathname;
     path = path.split("/");
     path = path[path.length - 1];
-    
 
     if (url.indexOf(path) <= 0) {
       return <Error404 />;
@@ -260,6 +259,7 @@ const Markup = () => {
 
         <Route path="/settings" element={<Settings />} />
         <Route path="/home" element={<StartConversation />} />
+        <Route path="" element={<StartConversation />} />
 
         <Route path="ticket-management" element={<TicketManagementLayout />}>
           <Route index element={<TicketManagement />} />
