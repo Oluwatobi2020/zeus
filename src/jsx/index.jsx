@@ -125,14 +125,13 @@ import Agent from "./components/Agent/Agent";
 import Settings from "./components/Settings/Settings";
 import Ticket from "./components/Ticket/Ticket";
 import TicketChat from "./components/Ticket/TicketChat";
-import { ChatProvider } from "../context/ChatContext";
 import StartConversation from "./components/Home/Home";
 import Login from "./pages/Login";
 
 const Markup = () => {
   const allroutes = [
     /// Dashboard
-    { url: "", component: <Home /> },
+    { url: "", component: <StartConversation /> },
     { url: "dashboard", component: <Home /> },
     { url: "dashboard-dark", component: <DashboardDark /> },
 
@@ -228,6 +227,7 @@ const Markup = () => {
     let path = window.location.pathname;
     path = path.split("/");
     path = path[path.length - 1];
+    
 
     if (url.indexOf(path) <= 0) {
       return <Error404 />;
