@@ -118,7 +118,6 @@ export const TicketProvider = ({ children }) => {
   };
 
   const addChatMessage = (ticketId, message) => {
-    console.log(ticketId, message);
     setListOfTickets((prev) =>
       prev.map((ticket) =>
         ticket.id === ticketId

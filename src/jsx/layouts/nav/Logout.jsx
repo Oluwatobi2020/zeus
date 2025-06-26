@@ -1,5 +1,13 @@
 import React from "react";
-import { Link, NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import { Button } from "react-bootstrap";
+import { useAuth } from "../../../context/AuthContext";
 
 function withRouter(Component) {
   function ComponentWithRouterProp(props) {
@@ -13,10 +21,14 @@ function withRouter(Component) {
 }
 
 function LogoutPage() {
-  function onLogout() {}
+  const { signOut } = useAuth();
+
   return (
     <>
-      <button className="dropdown-item ai-icon" onClick={onLogout}>
+      <button
+        className="dropdown-item ai-icon d-flex align-items-center"
+        onClick={signOut}
+      >
         <svg
           id="icon-logout"
           xmlns="http://www.w3.org/2000/svg"
@@ -34,10 +46,10 @@ function LogoutPage() {
           <polyline points="16 17 21 12 16 7" />
           <line x1={21} y1={12} x2={9} y2={12} />
         </svg>
-        <NavLink to="/login">
+        <p className="mb-0">
           {/* <i className="fas fa-cog text-primary-custom me-2" /> */}
-          <span style={{marginLeft:"0.5rem"}}>Logout</span>
-        </NavLink>
+          <span style={{ marginLeft: "0.5rem" }}>Logout</span>
+        </p>
       </button>
     </>
   );

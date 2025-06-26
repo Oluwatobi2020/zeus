@@ -5,8 +5,10 @@ import { BsFillArrowUpCircleFill } from "react-icons/bs";
 import { useChat } from "../../../../context/ChatContext";
 import TextareaAutosize from "react-textarea-autosize";
 import { BsSendFill } from "react-icons/bs";
+import { useAuth } from "../../../../context/AuthContext";
 
 const ChatInputField = ({ userChats }) => {
+  const { userData } = useAuth();
   const { sendMessage } = useChat();
   const [message, setMessage] = useState("");
 
@@ -15,7 +17,7 @@ const ChatInputField = ({ userChats }) => {
     sendMessage({
       text: message,
       timestamp: new Date(),
-      from: { id: "user" },
+      from: { id: userData.id },
     });
     setMessage("");
   };
@@ -37,7 +39,7 @@ const ChatInputField = ({ userChats }) => {
         marginTop: "auto",
         marginBottom: "20px",
         position: "absolute",
-        bottom: "10px"
+        bottom: "10px",
       }}
     >
       <TextareaAutosize

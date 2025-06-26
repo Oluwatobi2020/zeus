@@ -1,40 +1,52 @@
 import axios from "axios";
-import { createContext, useContext, useState, useEffect, useRef } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
+import useIdleLogout from "../hooks/useIdleLogout";
+import { toast } from "react-hot-toast";
+import useFetchAuthToken from "../hooks/useFetchAuthToken";
+import secureLocalStorage from "react-secure-storage";
+import { STAFF_TYPE } from "../jsx/constant/user";
+import { generateErrorMessage } from "../utils/generateErrorMessage";
 
 const authContext = createContext(undefined);
 
+export const AUTH_LOCAL_STORAGE_KEY = "auth";
+
 export const AuthProvider = ({ children }) => {
+  const [userData, setUserData] = useState(
+    () => secureLocalStorage.getItem(AUTH_LOCAL_STORAGE_KEY) || null
+  );
+
+  const [isAuthLoading, setIsAuthLoading] = useState();
+
   const token = useRef("");
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post(
-          "https://204.8.207.123/coralauth/api/authentication",
-          {
-            username: process.env.REACT_APP_AUTH_NAME,
-            password: process.env.REACT_APP_AUTH_PASSWORD,
-            appKey: process.env.REACT_APP_AUTH_APP_KEY,
-          }
-        );
-
-        token.current = response.data.activity;
-      } catch (err) {
-        console.error(" error:", err.message);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   const navigate = useNavigate();
 
-  const authenticateUser = async (email, password) => {
-    console.log(email, password);
+  useFetchAuthToken(token);
+  useIdleLogout(userData, signOut);
 
+  function signOut() {
+    setUserData(null);
+    secureLocalStorage.removeItem(AUTH_LOCAL_STORAGE_KEY);
+    navigate("/");
+  }
+
+  const updateUserData = useCallback((data) => {
+    setUserData(data);
+    secureLocalStorage.setItem(AUTH_LOCAL_STORAGE_KEY, data);
+  }, []);
+
+  const authenticateUserWithEmailAndPassword = async ({ email, password }) => {
     try {
+      setIsAuthLoading(true);
       const response = await axios.post(
-        "https://204.8.207.123/coralauth/api/onlineauth",
+        `${process.env.REACT_APP_AUTH_BACKEND_BASE_URL}/onlineauth`,
         {
           username: email,
           password: password,
@@ -46,16 +58,29 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      navigate("/dashboard");
+      if (response.data.Response) {
+        const userData = { id: email, type: STAFF_TYPE };
+        updateUserData(userData);
+        navigate("/home");
+      } else {
+        toast.error("Invalid credientials");
+      }
     } catch (error) {
-      console.error("Axios error:", error);
+      console.log("error => ", error);
+      toast.error(generateErrorMessage(error));
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
   return (
     <authContext.Provider
       value={{
-        authenticateUser,
+        authenticateUserWithEmailAndPassword,
+        signOut,
+        userData,
+        updateUserData,
+        isAuthLoading,
       }}
     >
       {children}

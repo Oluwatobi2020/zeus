@@ -6,6 +6,7 @@ import profile from "../../../images/profile/pic1.jpg";
 import LogoutPage from "./Logout";
 import { ThemeContext } from "../../../context/ThemeContext";
 import TicketManagementNavBar from "./TicketManagementNavBar";
+import { useAuth } from "../../../context/AuthContext";
 
 const Header = ({ onNote }) => {
   const { background, changeBackground } = useContext(ThemeContext);

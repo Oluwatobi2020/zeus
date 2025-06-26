@@ -127,6 +127,8 @@ import Ticket from "./components/Ticket/Ticket";
 import TicketChat from "./components/Ticket/TicketChat";
 import StartConversation from "./components/Home/Home";
 import Login from "./pages/Login";
+import User from "./components/Home/User";
+
 
 const Markup = () => {
   const allroutes = [
@@ -259,7 +261,7 @@ const Markup = () => {
 
         <Route path="/settings" element={<Settings />} />
         <Route path="/home" element={<StartConversation />} />
-        <Route path="" element={<StartConversation />} />
+        <Route path="" element={<User />} />
 
         <Route path="ticket-management" element={<TicketManagementLayout />}>
           <Route index element={<TicketManagement />} />
@@ -270,6 +272,7 @@ const Markup = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ScrollToTop />
+     
     </>
   );
 };
