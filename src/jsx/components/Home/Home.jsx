@@ -4,11 +4,16 @@ import { useChat } from "../../../context/ChatContext";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
-import { CHANNELS } from "../../constant/channels";
+import { useDocument } from "../../../context/DocumentContext";
+import { useAuth } from "../../../context/AuthContext";
+import { STAFF_TYPE } from "../../constant/user";
 
 function StartConversation() {
   const { startConversation, startConversationForDocumentation } = useChat();
   const navigate = useNavigate();
+
+  const { documents } = useDocument();
+  const { userData } = useAuth();
 
   const [show, setShow] = useState(false);
 
@@ -39,12 +44,14 @@ function StartConversation() {
       </div>
       <h1 className="">Start a Conversation With Zeus</h1>
       <div className="mt-3">
-        <Button
-          className="me-3 background-primary-custom "
-          onClick={startNormalConversation}
-        >
-          Normal Conversation
-        </Button>
+        {userData.type === STAFF_TYPE ? (
+          <Button
+            className="me-3 background-primary-custom "
+            onClick={startNormalConversation}
+          >
+            Customer Support
+          </Button>
+        ) : null}
         <Button
           style={{
             backgroundColor: "transparent",
@@ -53,7 +60,7 @@ function StartConversation() {
           }}
           onClick={handleShow}
         >
-          Documentation Conversation
+          Documentation Enquiry
         </Button>
       </div>
 
@@ -61,21 +68,33 @@ function StartConversation() {
         <Modal.Header closeButton>
           <Modal.Title>Select a channel type</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between" }}>
-          {CHANNELS.map(({ name, slug }) => (
-            <Button
+        <Modal.Body>
+          {documents.length > 0 ? (
+            <div
               style={{
-                display: "block",
-                width: "30%",
-                marginBottom: "10px",
-                border: "0",
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                gap: "10px",
               }}
-              className="custom-button"
-              onClick={() => startDocumentaion(slug)}
             >
-              {name}
-            </Button>
-          ))}
+              {documents.map(({ key, value }) => (
+                <Button
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    border: "0",
+                  }}
+                  key={key}
+                  className="custom-button"
+                  onClick={() => startDocumentaion(value)}
+                >
+                  {key}
+                </Button>
+              ))}
+            </div>
+          ) : (
+            <p style={{ textAlign: "center" }}>No Channel available</p>
+          )}
         </Modal.Body>
       </Modal>
     </main>

@@ -8,25 +8,21 @@ import {
   useCallback,
 } from "react";
 import { useSearchParams } from "react-router-dom";
-import { CHANNELS } from "../jsx/constant/channels";
+import { generateErrorMessages } from "../utils/generateZeusErrorMessage";
+import { LIST_OF_MESSAGES } from "../jsx/constant/introMessages";
+import { useAuth } from "./AuthContext";
+import { useDocument } from "./DocumentContext";
 
 const chatContext = createContext(undefined);
-
-export const userID = "user";
-
-const LIST_OF_MESSAGES = [
-  "Hey there! I’m Zeus ⚡️—your friendly transaction tracker. Let’s check that payment. Just send me your transaction ID and payment channel.",
-  "Welcome aboard! Zeus here. To get started, please drop your transaction ID and channel. I promise I won’t bite… unless you’re a packet. 🧾",
-  "Ah, a new traveler in the land of transactions! I'm Zeus. Give me a transaction ID and a payment channel, and I’ll do the digging.",
-  "Hello! I’m Zeus—here to check the status of your transaction, without the stress. All I need is your transaction ID and channel.",
-  "Greetings, mortal! Just kidding 😄. I’m Zeus. Toss me your transaction ID and payment channel, and I’ll check things faster than a lightning bolt ⚡.",
-];
 
 const randomMessageIndex = Math.floor(Math.random() * LIST_OF_MESSAGES.length);
 
 export const ChatProvider = ({ children }) => {
+  const { userData } = useAuth();
   const [searchParams] = useSearchParams();
   const conversationType = searchParams.get("type");
+
+  const { documents } = useDocument();
 
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,23 +33,28 @@ export const ChatProvider = ({ children }) => {
     expireTime: 3600,
   });
 
-  const selectedConversation = CHANNELS?.find(
-    (channel) => channel.slug === conversationType
+  const selectedConversation = documents?.find(
+    (channel) => channel.value === conversationType
   );
 
   const startConversationForDocumentation = useCallback(
     async function startConversationForDocumentation() {
+      if (!userData) return;
+
       try {
         setMessages([
           {
-            text: `Welcome to Zeus API Document Assistant for ${selectedConversation?.name.toUpperCase()}!`,
+            text: `Welcome to Zeus API Document Assistant for ${selectedConversation?.key.toUpperCase()}!`,
             timestamp: new Date(),
             from: { id: "coralpaybot" },
           },
         ]);
         const res = await axios.post(
-          `${process.env.REACT_APP_BACKEND_BASE_URL}/conversation/ZeusDocumentAssistant`,
-          {},
+          `${process.env.REACT_APP_ZEUS_BACKEND_BASE_URL}/conversation/ZeusDocumentAssistant`,
+          {
+            userId: userData.id,
+            requestedDocumentKey: conversationType,
+          },
           {
             headers: {
               apiKey: process.env.REACT_APP_ZESUS_API_KEY,
@@ -61,6 +62,49 @@ export const ChatProvider = ({ children }) => {
           }
         );
 
+        const { token, conversationId, expiresIn } = res.data;
+
+        tokenInformation.current = {
+          token,
+          conversationId,
+          expireTime: expiresIn * 1000,
+        };
+      } catch (err) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: generateErrorMessages(err),
+            timestamp: new Date(),
+            from: { id: "coralpaybot" },
+          },
+        ]);
+      }
+    },
+    [conversationType, selectedConversation?.key, userData]
+  );
+
+  const startConversation = useCallback(
+    async function startConversation() {
+      try {
+        setMessages([
+          {
+            text: LIST_OF_MESSAGES[randomMessageIndex],
+            timestamp: new Date(),
+            from: { id: "coralpaybot" },
+          },
+        ]);
+        const res = await axios.post(
+          `${process.env.REACT_APP_ZEUS_BACKEND_BASE_URL}/conversation`,
+          {
+            userId: userData.id,
+            CoralAuth: true,
+          },
+          {
+            headers: {
+              apiKey: process.env.REACT_APP_ZESUS_API_KEY,
+            },
+          }
+        );
         const { token, conversationId, expires_in } = res.data;
 
         tokenInformation.current = {
@@ -79,12 +123,13 @@ export const ChatProvider = ({ children }) => {
         ]);
       }
     },
-    [selectedConversation?.name]
+    [userData]
   );
 
   useEffect(() => {
+    if (!userData) return;
+
     if (selectedConversation) {
-      console.log(selectedConversation.name)
       startConversationForDocumentation();
     } else {
       startConversation();
@@ -92,49 +137,17 @@ export const ChatProvider = ({ children }) => {
 
     const intervalID = setInterval(refreshToken, 3500 * 1000);
     return () => clearInterval(intervalID);
-  }, [selectedConversation, startConversationForDocumentation]);
-
-  async function startConversation() {
-    try {
-      setMessages([
-        {
-          text: LIST_OF_MESSAGES[randomMessageIndex],
-          timestamp: new Date(),
-          from: { id: "coralpaybot" },
-        },
-      ]);
-      const res = await axios.post(
-        `${process.env.REACT_APP_BACKEND_BASE_URL}/conversation`,
-        {},
-        {
-          headers: {
-            apiKey: process.env.REACT_APP_ZESUS_API_KEY,
-          },
-        }
-      );
-      const { token, conversationId, expires_in } = res.data;
-
-      tokenInformation.current = {
-        token,
-        conversationId,
-        expireTime: expires_in * 1000,
-      };
-    } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: generateErrorMessages(err),
-          timestamp: new Date(),
-          from: { id: "coralpaybot" },
-        },
-      ]);
-    }
-  }
+  }, [
+    selectedConversation,
+    startConversation,
+    startConversationForDocumentation,
+    userData,
+  ]);
 
   const refreshToken = async () => {
     try {
       const res = await axios.post(
-        `${process.env.REACT_APP_BACKEND_BASE_URL}/refreshToken`,
+        `${process.env.REACT_APP_ZEUS_BACKEND_BASE_URL}/refreshToken`,
         {
           conversationId: tokenInformation.current.conversationId,
         },
@@ -171,12 +184,12 @@ export const ChatProvider = ({ children }) => {
       setIsLoading(true);
 
       const res = await axios.post(
-        `${process.env.REACT_APP_BACKEND_BASE_URL}/message`,
+        `${process.env.REACT_APP_ZEUS_BACKEND_BASE_URL}/message`,
         {
           type: "message",
-          from: { id: userID },
+          from: { id: userData.id },
           text:
-            (selectedConversation ? `#${selectedConversation.slug}` : "") +
+            (selectedConversation ? `#${selectedConversation.value} ` : "") +
             message.text,
           conversationId: tokenInformation.current.conversationId,
         },
@@ -189,7 +202,26 @@ export const ChatProvider = ({ children }) => {
         }
       );
 
-      setMessages((prev) => [...prev, res.data.activity]);
+      const activity = res.data.activity;
+
+      if (
+        !activity ||
+        !activity.text ||
+        (typeof activity.text === "string" && activity.text.trim() === "")
+      ) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            text:
+              res.data.responseHeader.responseMessage ||
+              "🤔 Hmm... I didn't get a proper response. Mind trying that again?",
+            timestamp: new Date(),
+            from: { id: "coralpaybot" },
+          },
+        ]);
+      } else {
+        setMessages((prev) => [...prev, activity]);
+      }
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -226,76 +258,3 @@ export const useChat = () => {
   }
   return context;
 };
-
-function generateErrorMessages(err) {
-  let errorMessage =
-    "Hmm... something unexpected just happened 🤔. Could you please prompt me again? Thank you! – Zeus";
-
-  if (axios.isAxiosError(err)) {
-    if (err.response) {
-      const status = err.response.status;
-
-      if (status === 401) {
-        errorMessage =
-          "Oops! You're not authorized to do that. Please log in and try again.";
-      } else if (status === 403) {
-        errorMessage = "Looks like you don’t have permission for this action.";
-      } else if (status === 404) {
-        errorMessage =
-          "Hmm... I couldn’t find that conversation. 🧐 Want to try again?";
-      } else if (status >= 500) {
-        errorMessage =
-          "Uh-oh! Something's up on our side. Let’s try again shortly. ⚙️";
-      } else if (err.response.data?.message) {
-        errorMessage = err.response.data.message + " – Zeus";
-      }
-    } else if (err.request) {
-      errorMessage =
-        "I'm having trouble reaching the server 🌐. Please check your connection and try again.";
-    }
-  }
-
-  return errorMessage;
-}
-
-// const fetchToken = async () => {
-//   try {
-//     const res = await axios.post(
-//       "https://directline.botframework.com/v3/directline/conversations",
-//       {},
-//       {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//         },
-//       }
-//     );
-
-//     const { token, conversationId, expires_in } = res.data;
-
-//     tokenInformation.current = {
-//       token,
-//       conversationId,
-//       expireTime: expires_in * 1000,
-//     };
-//   } catch (err) {
-//     console.log("FETCHING ERROR HERE => ", err);
-//   }
-// };
-
-// const getMessage = async () => {
-//   try {
-//     const res = await axios.get(
-//       `https://directline.botframework.com/v3/directline/conversations/${tokenInformation.current.conversationId}/activities`,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${tokenInformation.current.token}`,
-//         },
-//       }
-//     );
-
-//     console.log(res.data.activities);
-//     setMessages(res.data.activities);
-//   } catch (err) {
-//     console.log("THIS IS GET MESSAGE ERROR => ", err);
-//   }
-// };

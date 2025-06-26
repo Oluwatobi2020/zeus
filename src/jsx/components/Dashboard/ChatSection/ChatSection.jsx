@@ -1,4 +1,3 @@
-import { userID } from "../../../../context/ChatContext";
 import ReplyChat from "./ReplyChat";
 import SendChat from "./SendChat";
 
@@ -19,7 +18,7 @@ const ChatSection = ({
         id="DZ_W_Contacts_Body3"
       >
         {messages?.map((msg, index) =>
-          msg?.from?.id === userID ? (
+          msg?.from?.id === "" ? (
             <SendChat
               key={index}
               content={msg.text}

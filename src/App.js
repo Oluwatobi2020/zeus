@@ -1,111 +1,65 @@
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense } from "react";
 
-/// Components
+import User from "./jsx/components/Home/User";
+import Login from "./jsx/pages/Login";
+
 import Index from "./jsx";
-import { connect, useDispatch } from "react-redux";
-import {
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
-// action
-import { checkAutoLogin } from "./services/AuthService";
-import { isAuthenticated } from "./store/selectors/AuthSelectors";
-/// Style
+
+import { Routes, Route } from "react-router-dom";
 
 import "./css/style.css";
+import { useAuth } from "./context/AuthContext";
+import Error404 from "./jsx/pages/Error404";
+import { ChatProvider } from "./context/ChatContext";
 
-// const SignUp = lazy(() => import("./jsx/pages/Registration"));
-// const Login = lazy(() => {
-//   return new Promise((resolve) => {
-//     setTimeout(() => resolve(import("./jsx/pages/Login")), 500);
-//   });
-// });
-
-function withRouter(Component) {
-  function ComponentWithRouterProp(props) {
-    let location = useLocation();
-    let navigate = useNavigate();
-    let params = useParams();
-
-    return <Component {...props} router={{ location, navigate, params }} />;
-  }
-
-  return ComponentWithRouterProp;
-}
+import { DocumentProvider } from "./context/DocumentContext";
 
 function App() {
-  // const dispatch = useDispatch();
-  // const navigate = useNavigate();
-  
-  // useEffect(() => {
-  //   checkAutoLogin(dispatch, navigate);
-  // }, []);
+  const { userData } = useAuth();
 
-  // let routeblog = (
-  //   <Routes>
-  //     <Route path="/login" element={<Login />} />
-  //     <Route path="/page-register" element={<SignUp />} />
-  //   </Routes>
-  // );
-
-  return (
+  if (userData) {
+    return (
       <>
-        <Suspense
-          fallback={
-            <div id="preloader">
-              <div className="sk-three-bounce">
-                <div className="sk-child sk-bounce1"></div>
-                <div className="sk-child sk-bounce2"></div>
-                <div className="sk-child sk-bounce3"></div>
-              </div>
-            </div>
-          }
-        >
-          <Index />
-        </Suspense>
+        <DocumentProvider>
+          <ChatProvider>
+            <Suspense
+              fallback={
+                <div id="preloader">
+                  <div className="sk-three-bounce">
+                    <div className="sk-child sk-bounce1"></div>
+                    <div className="sk-child sk-bounce2"></div>
+                    <div className="sk-child sk-bounce3"></div>
+                  </div>
+                </div>
+              }
+            >
+              <Index />
+            </Suspense>
+          </ChatProvider>
+        </DocumentProvider>
       </>
     );
-
-  // if (props.isAuthenticated) {
-  //   return (
-  //     <>
-  //       <Suspense
-  //         fallback={
-  //           <div id="preloader">
-  //             <div className="sk-three-bounce">
-  //               <div className="sk-child sk-bounce1"></div>
-  //               <div className="sk-child sk-bounce2"></div>
-  //               <div className="sk-child sk-bounce3"></div>
-  //             </div>
-  //           </div>
-  //         }
-  //       >
-  //         <Index />
-  //       </Suspense>
-  //     </>
-  //   );
-  // } else {
-  //   return (
-  //     <div className="vh-100">
-  //       <Suspense
-  //         fallback={
-  //           <div id="preloader">
-  //             <div className="sk-three-bounce">
-  //               <div className="sk-child sk-bounce1"></div>
-  //               <div className="sk-child sk-bounce2"></div>
-  //               <div className="sk-child sk-bounce3"></div>
-  //             </div>
-  //           </div>
-  //         }
-  //       >
-  //         {routeblog}
-  //       </Suspense>
-  //     </div>
-  //   );
-  // }
+  } else {
+    return (
+      <Suspense
+        fallback={
+          <div id="preloader">
+            <div className="sk-three-bounce">
+              <div className="sk-child sk-bounce1"></div>
+              <div className="sk-child sk-bounce2"></div>
+              <div className="sk-child sk-bounce3"></div>
+            </div>
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="" element={<User />} />
+          <Route path="*" element={<Error404 />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Suspense>
+    );
+  }
 }
 
 // const mapStateToProps = (state) => {

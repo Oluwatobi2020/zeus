@@ -1,11 +1,13 @@
 import ReactMarkdown from "react-markdown";
 import { useEffect, useRef } from "react";
-import { userID, useChat } from "../../../../context/ChatContext";
+import { useChat } from "../../../../context/ChatContext";
+import { useAuth } from "../../../../context/AuthContext";
 
 function Messages({ messages }) {
   const scrollContainerRef = useRef();
 
   const { isLoading } = useChat();
+  const { userData } = useAuth();
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -21,7 +23,7 @@ function Messages({ messages }) {
       ref={scrollContainerRef}
     >
       {messages.map((msg, idx) => {
-        const isUser = msg?.from?.id === userID;
+        const isUser = msg?.from?.id === userData.id;
 
         return (
           <div
@@ -36,7 +38,7 @@ function Messages({ messages }) {
               marginLeft: isUser ? "auto" : "",
             }}
           >
-            <ReactMarkdown>{msg.text}</ReactMarkdown>
+            <ReactMarkdown>{msg.text || "Zeus "}</ReactMarkdown>
 
             <small className=" d-block text-end" style={{ fontSize: "11px" }}>
               {new Date(msg.timestamp).toLocaleTimeString([], {
