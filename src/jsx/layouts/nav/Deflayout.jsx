@@ -122,11 +122,7 @@ const Deflayout = ({ title, onClick: ClickToAddEvent }) => {
             />
             ZEUS{" "}
             <span
-<<<<<<< HEAD
-              className="close-fixed-content fa-left d-lg-none"
-=======
               className="close-fixed-content fa-left d-md-none"
->>>>>>> dev-tobi
               onClick={() => setOpenSidebar(false)}
             >
               <svg
