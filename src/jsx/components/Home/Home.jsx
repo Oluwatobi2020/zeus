@@ -64,7 +64,7 @@ function StartConversation() {
         </Button>
       </div>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={handleClose} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Select a channel type</Modal.Title>
         </Modal.Header>
@@ -74,7 +74,8 @@ function StartConversation() {
               style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 1fr 1fr",
-                gap: "10px",
+                gap: "2em",
+                fontSize: "0.8em",
               }}
             >
               {documents.map(({ key, value }) => (

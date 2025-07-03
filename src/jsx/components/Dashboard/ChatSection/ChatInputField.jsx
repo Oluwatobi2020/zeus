@@ -1,16 +1,17 @@
 import { useState } from "react";
-import { BiMicrophone } from "react-icons/bi";
 import { BsFillArrowUpCircleFill } from "react-icons/bs";
 
 import { useChat } from "../../../../context/ChatContext";
 import TextareaAutosize from "react-textarea-autosize";
 import { BsSendFill } from "react-icons/bs";
 import { useAuth } from "../../../../context/AuthContext";
+import MicroPhone from "./MicroPhone";
 
 const ChatInputField = ({ userChats }) => {
   const { userData } = useAuth();
   const { sendMessage } = useChat();
   const [message, setMessage] = useState("");
+  const [interimMessage, setInterimMessage] = useState(""); // NEW
 
   const handleSend = async () => {
     if (message.trim() === "") return;
@@ -28,6 +29,7 @@ const ChatInputField = ({ userChats }) => {
       handleSend();
     }
   };
+
   return (
     <form
       style={{
@@ -57,21 +59,21 @@ const ChatInputField = ({ userChats }) => {
           boxShadow: "none",
           border: "none",
         }}
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        value={message + interimMessage}
+        onChange={(e) => {
+          setMessage(e.target.value);
+          setInterimMessage("");
+        }}
         onKeyDown={handleKeyDown}
       />
       <div
         className="d-flex justify-content-end align-items-center p-2 gap-2"
         style={{ background: "#fff" }}
       >
-        <button
-          className="me-2"
-          style={{ border: "none", background: "#fff" }}
-          type="button"
-        >
-          <BiMicrophone size={20} color="#000" />
-        </button>
+        <MicroPhone
+          setMessage={setMessage}
+          setInterimMessage={setInterimMessage}
+        />
 
         <button
           className="me-2"

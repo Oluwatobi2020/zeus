@@ -50,6 +50,8 @@ export const DocumentProvider = ({ children }) => {
   },
   []);
 
+  
+
   useEffect(() => {
     if (userData) {
       getDocumentAccess(userData.id);

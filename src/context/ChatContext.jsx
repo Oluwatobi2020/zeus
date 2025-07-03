@@ -12,6 +12,7 @@ import { generateErrorMessages } from "../utils/generateZeusErrorMessage";
 import { LIST_OF_MESSAGES } from "../jsx/constant/introMessages";
 import { useAuth } from "./AuthContext";
 import { useDocument } from "./DocumentContext";
+import useStartConversation from "../hooks/useStartConversation";
 
 const chatContext = createContext(undefined);
 
@@ -123,26 +124,8 @@ export const ChatProvider = ({ children }) => {
         ]);
       }
     },
-    [userData]
+    [userData.id]
   );
-
-  useEffect(() => {
-    if (!userData) return;
-
-    if (selectedConversation) {
-      startConversationForDocumentation();
-    } else {
-      startConversation();
-    }
-
-    const intervalID = setInterval(refreshToken, 3500 * 1000);
-    return () => clearInterval(intervalID);
-  }, [
-    selectedConversation,
-    startConversation,
-    startConversationForDocumentation,
-    userData,
-  ]);
 
   const refreshToken = async () => {
     try {
@@ -235,6 +218,19 @@ export const ChatProvider = ({ children }) => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!userData) return;
+
+    const intervalID = setInterval(refreshToken, 3500 * 1000);
+    return () => clearInterval(intervalID);
+  }, [userData]);
+
+  useStartConversation({
+    selectedConversation,
+    startConversation,
+    startConversationForDocumentation,
+  });
 
   return (
     <chatContext.Provider
