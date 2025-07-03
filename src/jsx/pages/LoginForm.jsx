@@ -32,6 +32,7 @@ function LoginForm() {
               type="email"
               name="email"
               className="form-control form-control-lg"
+              autoComplete="off"
             />
             <ErrorMessage
               name="email"
@@ -47,11 +48,12 @@ function LoginForm() {
 
             <div className="password-wrapper d-flex gap-1 align-items-center px-3 form-control-lg">
               <Field
-                type={isPasswordVisible ? "text" : "password"}
+                type={isPasswordVisible ? "password" : "text"}
                 name="password"
                 id="password"
                 className="flex-grow-1 border-0 bg-transparent p-0  form-control"
                 style={{ boxShadow: "none" }}
+                autoComplete="off"
               />
               <button
                 type="button"
@@ -66,9 +68,9 @@ function LoginForm() {
                 }}
               >
                 {isPasswordVisible ? (
-                  <Eye style={{ width: "20px", height: "20px" }} />
-                ) : (
                   <EyeSlash style={{ width: "20px", height: "20px" }} />
+                ) : (
+                  <Eye style={{ width: "20px", height: "20px" }} />
                 )}
               </button>
             </div>

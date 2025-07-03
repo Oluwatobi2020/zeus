@@ -1,0 +1,11 @@
+REACT_APP_ZESUS_API_KEY = "1234567890"
+REACT_APP_BACKEND_BASE_URL = "https://testdev.coralpay.com"
+REACT_APP_ZEUS_BACKEND_BASE_URL = "https://testdev.coralpay.com:5000/ZeusApiService/api/Zeus"
+REACT_APP_AUTH_BACKEND_BASE_URL = "https://testdev.coralpay.com/coralauth/api"
+
+REACT_APP_AUTH_NAME = "zeus"
+REACT_APP_AUTH_PASSWORD = "Welcome123#"
+REACT_APP_AUTH_APP_KEY = "zeusk"
+
+REACT_APP_SECURE_LOCAL_STORAGE_PREFIX = coralpay_zeus
+SECURE_LOCAL_STORAGE_HASH_KEY= 2675787927867
