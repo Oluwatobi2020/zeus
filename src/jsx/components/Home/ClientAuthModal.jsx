@@ -42,6 +42,7 @@ function ClientAuthModal({ show, onClose }) {
                 type="accessKey"
                 name="accessKey"
                 className="form-control"
+                autoComplete="off"
               />
               <ErrorMessage
                 name="accessKey"

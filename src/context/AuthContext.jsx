@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
   function signOut() {
     setUserData(null);
     secureLocalStorage.removeItem(AUTH_LOCAL_STORAGE_KEY);
+    secureLocalStorage.removeItem("clientName");
     navigate("/");
   }
 
@@ -63,11 +64,10 @@ export const AuthProvider = ({ children }) => {
         updateUserData(userData);
         navigate("/home");
       } else {
-        toast.error("Invalid credientials");
+        toast.error("Invalid credientials", { id: "crediential" });
       }
     } catch (error) {
-      console.log("error => ", error);
-      toast.error(generateErrorMessage(error));
+      toast.error(generateErrorMessage(error), { id: "crediential" });
     } finally {
       setIsAuthLoading(false);
     }

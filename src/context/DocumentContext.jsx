@@ -10,6 +10,7 @@ import {
 import { toast } from "react-hot-toast";
 
 import { useAuth } from "./AuthContext";
+import secureLocalStorage from "react-secure-storage";
 
 const documentContext = createContext(undefined);
 
@@ -34,6 +35,8 @@ export const DocumentProvider = ({ children }) => {
 
       if (responseCode === "00") {
         setDocuments(response.data.accessList);
+        secureLocalStorage.setItem("clientName", response?.data?.username)
+
         return true;
       } else {
         toast.error(response.data.responseHeader.responseMessage);
@@ -46,6 +49,8 @@ export const DocumentProvider = ({ children }) => {
     }
   },
   []);
+
+  
 
   useEffect(() => {
     if (userData) {

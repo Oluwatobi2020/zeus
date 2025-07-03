@@ -1,18 +1,18 @@
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useEffect, useRef } from "react";
 import { useChat } from "../../../../context/ChatContext";
 import { useAuth } from "../../../../context/AuthContext";
 
 function Messages({ messages }) {
-  const scrollContainerRef = useRef();
+  const lastMessageRef = useRef();
 
   const { isLoading } = useChat();
   const { userData } = useAuth();
 
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      const el = scrollContainerRef.current;
-      el.scrollTop = el.scrollHeight;
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
@@ -20,15 +20,17 @@ function Messages({ messages }) {
     <div
       className="flex-grow-1 mb-3"
       style={{ overflowY: "scroll", height: "57vh", minHeight: "57vh" }}
-      ref={scrollContainerRef}
     >
       {messages.map((msg, idx) => {
         const isUser = msg?.from?.id === userData.id;
 
+        const isLastMessage = idx === messages.length - 1;
+
         return (
           <div
             key={idx}
-            className={`mb-3 mt-1 px-2 py-1 rounded border`}
+            ref={isLastMessage ? lastMessageRef : null}
+            className={`mb-3 mt-1 px-2 py-1 rounded border markdown-body`}
             style={{
               backgroundColor: isUser ? "white" : "#f8f9fa",
               fontSize: "14px",
@@ -38,7 +40,54 @@ function Messages({ messages }) {
               marginLeft: isUser ? "auto" : "",
             }}
           >
-            <ReactMarkdown>{msg.text || "Zeus "}</ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                table: ({ node, ...props }) => (
+                  <div style={{ overflowX: "auto" }}>
+                    <table
+                      {...props}
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        minWidth: "600px",
+                      }}
+                    />
+                  </div>
+                ),
+                th: ({ node, ...props }) => {
+                  const index = props["data-index"];
+                  const columnWidths = ["120px", "250px", "200px"];
+                  return (
+                    <th
+                      {...props}
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "8px",
+                        background: "#f9f9f9",
+                        minWidth: columnWidths[index] || "150px",
+                      }}
+                    />
+                  );
+                },
+                td: ({ node, ...props }) => {
+                  const index = props["data-index"];
+                  const columnWidths = ["120px", "250px", "200px"];
+                  return (
+                    <td
+                      {...props}
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: "8px",
+                        minWidth: columnWidths[index] || "150px",
+                      }}
+                    />
+                  );
+                },
+              }}
+            >
+              {msg.text}
+            </ReactMarkdown>
 
             <small className=" d-block text-end" style={{ fontSize: "11px" }}>
               {new Date(msg.timestamp).toLocaleTimeString([], {

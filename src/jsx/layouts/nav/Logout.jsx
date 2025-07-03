@@ -27,7 +27,11 @@ function LogoutPage() {
     <>
       <button
         className="dropdown-item ai-icon d-flex align-items-center"
+<<<<<<< HEAD
         onClick={signOut}
+=======
+        // onClick={signOut}
+>>>>>>> dev-tobi
       >
         <svg
           id="icon-logout"

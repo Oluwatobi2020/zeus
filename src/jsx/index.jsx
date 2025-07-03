@@ -128,6 +128,10 @@ import TicketChat from "./components/Ticket/TicketChat";
 import StartConversation from "./components/Home/Home";
 import Login from "./pages/Login";
 import User from "./components/Home/User";
+<<<<<<< HEAD
+=======
+import SplashScreen from "./pages/SplashScreen";
+>>>>>>> dev-tobi
 
 
 const Markup = () => {

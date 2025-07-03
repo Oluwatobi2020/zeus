@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Suspense } from "react";
+=======
+import { Suspense, useEffect, useState } from "react";
+>>>>>>> dev-tobi
 
 import User from "./jsx/components/Home/User";
 import Login from "./jsx/pages/Login";
@@ -13,9 +17,27 @@ import Error404 from "./jsx/pages/Error404";
 import { ChatProvider } from "./context/ChatContext";
 
 import { DocumentProvider } from "./context/DocumentContext";
+<<<<<<< HEAD
 
 function App() {
   const { userData } = useAuth();
+=======
+import SplashScreen from "./jsx/pages/SplashScreen";
+
+function App() {
+  const { userData } = useAuth();
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    if (showSplash) {
+      const timer = setTimeout(() => {
+        setShowSplash(false);
+      }, 10000); // 30 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
+>>>>>>> dev-tobi
 
   if (userData) {
     return (
@@ -53,7 +75,11 @@ function App() {
         }
       >
         <Routes>
+<<<<<<< HEAD
           <Route path="" element={<User />} />
+=======
+          <Route path="" element={showSplash ? <SplashScreen /> : <User />} />
+>>>>>>> dev-tobi
           <Route path="*" element={<Error404 />} />
           <Route path="/login" element={<Login />} />
         </Routes>

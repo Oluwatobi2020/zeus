@@ -1,5 +1,9 @@
 import rainbow from "../../images/rainbow.gif";
 import LoginForm from "./LoginForm";
+<<<<<<< HEAD
+=======
+import {NavLink} from "react-router-dom"
+>>>>>>> dev-tobi
 
 function Login() {
   return (
@@ -35,6 +39,12 @@ function Login() {
               <span style={{ color: "#64154a" }}>Login</span>
             </h6>
             <LoginForm />
+<<<<<<< HEAD
+=======
+            <div style={{display:"flex", justifyContent:"center"}}>
+              <NavLink to="/">Not a staff? Access ZEUS as a client</NavLink>
+            </div>
+>>>>>>> dev-tobi
           </div>
         </div>
       </div>
