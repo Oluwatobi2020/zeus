@@ -1,36 +1,51 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { CLIENT_TYPE } from "../jsx/constant/user";
+import { CLIENT_TYPE, STAFF_TYPE } from "../jsx/constant/user";
+import { useConversationType } from "../hooks/useConversationType";
+import { useDocument } from "../context/DocumentContext";
 
 function useStartConversation({
-  selectedConversation,
+  selectedChannel,
   startConversation,
   startConversationForDocumentation,
 }) {
   const { userData } = useAuth();
   const navigate = useNavigate();
-  const hasCheckedParams = typeof selectedConversation !== "undefined";
 
-  console.log("IA ")
+  const conversationType = useConversationType();
+  const { documents } = useDocument();
+
   useEffect(() => {
-    if (!userData && !hasCheckedParams) return;
-    console.log("I AM EGER")
+    if (!userData || documents.length === 0) return;
 
-    if (selectedConversation) {
-      startConversationForDocumentation();
-    } else if (userData.type === CLIENT_TYPE) {
-      navigate(`/home`);
-    } else {
-      startConversation();
+    const isStaff = userData.type === STAFF_TYPE;
+    const isClient = userData.type === CLIENT_TYPE;
+    const hasConversationType = conversationType !== null;
+
+    if (isStaff) {
+      if (!hasConversationType) {
+        startConversation();
+      } else if (hasConversationType && selectedChannel) {
+        startConversationForDocumentation();
+      } else if (hasConversationType && !selectedChannel) {
+        navigate("/home");
+      }
+    } else if (isClient) {
+      if (hasConversationType && selectedChannel) {
+        startConversationForDocumentation();
+      } else {
+        navigate("/home");
+      }
     }
   }, [
-    hasCheckedParams,
+    userData,
+    conversationType,
+    selectedChannel,
+    documents,
     navigate,
-    selectedConversation,
     startConversation,
     startConversationForDocumentation,
-    userData,
   ]);
 }
 

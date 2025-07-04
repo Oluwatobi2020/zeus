@@ -6,13 +6,14 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
 } from "react";
-import { useSearchParams } from "react-router-dom";
 import { generateErrorMessages } from "../utils/generateZeusErrorMessage";
 import { LIST_OF_MESSAGES } from "../jsx/constant/introMessages";
 import { useAuth } from "./AuthContext";
 import { useDocument } from "./DocumentContext";
 import useStartConversation from "../hooks/useStartConversation";
+import { useConversationType } from "../hooks/useConversationType";
 
 const chatContext = createContext(undefined);
 
@@ -20,8 +21,8 @@ const randomMessageIndex = Math.floor(Math.random() * LIST_OF_MESSAGES.length);
 
 export const ChatProvider = ({ children }) => {
   const { userData } = useAuth();
-  const [searchParams] = useSearchParams();
-  const conversationType = searchParams.get("type");
+  const conversationType = useConversationType();
+  const abortControllerRef = useRef(null);
 
   const { documents } = useDocument();
 
@@ -34,8 +35,9 @@ export const ChatProvider = ({ children }) => {
     expireTime: 3600,
   });
 
-  const selectedConversation = documents?.find(
-    (channel) => channel.value === conversationType
+  const selectedChannel = useMemo(
+    () => documents?.find((channel) => channel.value === conversationType),
+    [conversationType, documents]
   );
 
   const startConversationForDocumentation = useCallback(
@@ -45,7 +47,7 @@ export const ChatProvider = ({ children }) => {
       try {
         setMessages([
           {
-            text: `Welcome to Zeus API Document Assistant for ${selectedConversation?.key.toUpperCase()}!`,
+            text: `Welcome to Zeus API Document Assistant for ${selectedChannel?.key.toUpperCase()}!`,
             timestamp: new Date(),
             from: { id: "coralpaybot" },
           },
@@ -81,7 +83,7 @@ export const ChatProvider = ({ children }) => {
         ]);
       }
     },
-    [conversationType, selectedConversation?.key, userData]
+    [conversationType, selectedChannel?.key, userData]
   );
 
   const startConversation = useCallback(
@@ -162,6 +164,12 @@ export const ChatProvider = ({ children }) => {
   };
 
   const sendMessage = async (message) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const newController = new AbortController();
+    abortControllerRef.current = newController;
     try {
       setMessages((prev) => [...prev, message]);
       setIsLoading(true);
@@ -172,7 +180,7 @@ export const ChatProvider = ({ children }) => {
           type: "message",
           from: { id: userData.id },
           text:
-            (selectedConversation ? `#${selectedConversation.value} ` : "") +
+            (selectedChannel ? `#${selectedChannel.value} ` : "") +
             message.text,
           conversationId: tokenInformation.current.conversationId,
         },
@@ -182,6 +190,7 @@ export const ChatProvider = ({ children }) => {
             apiKey: process.env.REACT_APP_ZESUS_API_KEY,
             "Content-Type": "application/json",
           },
+          signal: newController.signal,
         }
       );
 
@@ -206,6 +215,13 @@ export const ChatProvider = ({ children }) => {
         setMessages((prev) => [...prev, activity]);
       }
     } catch (err) {
+      if (
+        err.name === "CanceledError" ||
+        err.name === "AbortError" ||
+        axios.isCancel?.(err)
+      ) {
+        return;
+      }
       setMessages((prev) => [
         ...prev,
         {
@@ -226,10 +242,26 @@ export const ChatProvider = ({ children }) => {
     return () => clearInterval(intervalID);
   }, [userData]);
 
+  const resetChat = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    tokenInformation.current = {
+      token: "",
+      conversationId: "",
+      expireTime: 3600,
+    };
+    setIsLoading(false);
+    setMessages([]);
+  };
+
   useStartConversation({
-    selectedConversation,
+    selectedChannel,
     startConversation,
     startConversationForDocumentation,
+    conversationType,
+    resetChat,
   });
 
   return (
@@ -240,6 +272,9 @@ export const ChatProvider = ({ children }) => {
         isLoading,
         startConversation,
         startConversationForDocumentation,
+        selectedChannel,
+        conversationId: tokenInformation.current.conversationId,
+        resetChat,
       }}
     >
       {children}

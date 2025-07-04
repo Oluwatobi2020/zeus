@@ -1,126 +1,56 @@
-import React, { Fragment, useState, useReducer } from "react";
-import { Tab, Nav, Collapse, Button } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Fragment, useState } from "react";
+import { Tab, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
-// import SideBar from "./SideBar";
-import NavHeader2 from "./NavHeader2";
 import Header from "./Header";
 import ChatBox from "../ChatBox";
 import CoralpayLogo from "../../../images/coralpay-logo.png";
 
-//Menus
-import { MenuList2 } from "./Menus2";
-
-//Images
-import icon1 from "./../../../images/browser/icon1.png";
-import icon2 from "./../../../images/browser/icon2.png";
-
-import ShareProfitCanvas from "./FixedData/ShareProfitCanvas";
-import DailySalesCanvas from "./FixedData/DailySalesCanvas";
-//Icons
-import { SVGICON } from "../../constant/theme";
-import LogoutMini from "./LogoutMini";
-import { MdEdit } from "react-icons/md";
-import { useLoader } from "../../../hooks/useLoader";
 import { RiChatNewLine } from "react-icons/ri";
 import { useChat } from "../../../context/ChatContext";
-
-const browserList = [
-  { image: icon1, title: "Chrome", color: "warning", percent: "90%" },
-  { image: icon2, title: "Firefox", color: "success", percent: "80%" },
-  { image: icon1, title: "Chrome", color: "danger", percent: "70%" },
-];
-
-const sidebarMenu = [
-  { mainicon: SVGICON.HomeIcon, menuKey: "Dashboard" },
-  { mainicon: SVGICON.HomeIcon2, menuKey: "Dashboard1" },
-  { mainicon: SVGICON.SettingIcon, menuKey: "Cms" },
-  { mainicon: SVGICON.AppsIcon, menuKey: "Apps" },
-  { mainicon: SVGICON.BootstrapIcon, menuKey: "Bootstrap" },
-  { mainicon: SVGICON.FormIcon, menuKey: "Form" },
-  { mainicon: SVGICON.TableIcon, menuKey: "Table" },
-  { mainicon: SVGICON.PageIcon, menuKey: "Page" },
-  // {mainicon: SVGICON.ShoppingIocn, menuKey:"Shopping"},
-];
-
-const initialState = false;
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "collpase0":
-      return { ...state, collpase0: !state.collpase0 };
-    case "collpase1":
-      return { ...state, collpase1: !state.collpase1 };
-    case "collpase2":
-      return { ...state, collpase2: !state.collpase2 };
-    case "collpase3":
-      return { ...state, collpase3: !state.collpase3 };
-    default:
-      return state;
-  }
-};
-
-const updateReducer = (previousState, updatedState) => ({
-  ...previousState,
-  ...updatedState,
-});
-
-const menuInitial = {
-  active: "",
-  activeSubmenu: "",
-};
+import { useAuth } from "../../../context/AuthContext";
+import { CLIENT_TYPE } from "../../constant/user";
 
 const Deflayout = ({ title, onClick: ClickToAddEvent }) => {
   const [toggle, setToggle] = useState("");
   const onClick = (name) => setToggle(toggle === name ? "" : name);
 
-  const navigate = useNavigate();
+  const {
+    startConversation,
+    startConversationForDocumentation,
+    selectedChannel,
+    resetChat,
+  } = useChat();
 
-  const [activeMenu, setActiveMenu] = useState(0);
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  const [menustate, setMenustate] = useReducer(updateReducer, menuInitial);
-  const handleMenuActive = (status) => {
-    setMenustate({ active: status });
-    if (menustate.active === status) {
-      setMenustate({ active: "" });
-    }
-  };
-  const handleSubmenuActive = (status) => {
-    setMenustate({ activeSubmenu: status });
-    if (menustate.activeSubmenu === status) {
-      setMenustate({ activeSubmenu: "" });
-    }
-  };
+  const { userData } = useAuth();
 
   const [openSidebar, setOpenSidebar] = useState(false);
-  const [closeSidebar, setCloseSidebar] = useState(0);
-  function handleMenuOpen(ind) {
-    if (ind === closeSidebar) {
-      setOpenSidebar(!openSidebar);
-    }
-  }
 
-  const customButton = {
-    background: "none",
-    border: "none",
-    fontSize: "1em",
-    fontWeight: 400,
+  const handleStartNewChat = () => {
+    resetChat();
+    if (!selectedChannel && userData.type !== CLIENT_TYPE) {
+      startConversation();
+      return;
+    } else {
+      startConversationForDocumentation();
+    }
   };
 
   return (
     <Fragment>
-      {/* <NavHeader2 openSidebar={openSidebar} /> */}
       <ChatBox onClick={() => onClick("chatbox")} toggle={toggle} />
       <Tab.Container defaultActiveKey={"Dashboard"}>
         <div className={`fixed-content-box ${openSidebar ? "active" : ""}`}>
           <div className="head-name">
-            <img
-              src={CoralpayLogo}
-              width={50}
-              height={50}
-              alt="coralpay-logo"
-            />
-            ZEUS{" "}
+            <Link to="/home" className="d-flex align-items-center">
+              <img
+                src={CoralpayLogo}
+                width={50}
+                height={50}
+                alt="coralpay-logo"
+              />
+              <p className="mb-0">ZEUS</p>
+            </Link>
             <span
               className="close-fixed-content fa-left d-md-none"
               onClick={() => setOpenSidebar(false)}
@@ -163,7 +93,7 @@ const Deflayout = ({ title, onClick: ClickToAddEvent }) => {
                 <div className="card">
                   <div className="card-header align-items-center">
                     <Button
-                      onClick={() => navigate("/home")}
+                      onClick={handleStartNewChat}
                       size="small"
                       variant="light"
                       className="me-2"
@@ -188,35 +118,6 @@ const Deflayout = ({ title, onClick: ClickToAddEvent }) => {
           onBox={() => onClick("box")}
           onClick={() => ClickToAddEvent()}
         />
-        {/* <SideBar /> */}
-        {/* <div className="deznav">
-          <div className="deznav-scroll">
-            <Nav as="ul" className="nav menu-tabs">
-              {sidebarMenu.map((item, index) => (
-                <Nav.Item
-                  as="li"
-                  key={index}
-                  onClick={() => {
-                    setOpenSidebar(true);
-                    handleMenuOpen(index);
-                    setCloseSidebar(index);
-                  }}
-                >
-                  <Nav.Link
-                    className="ai-icon"
-                    eventKey={item.menuKey}
-                    onClick={() => {
-                      setActiveMenu(index);
-                    }}
-                  >
-                    {item.mainicon}
-                  </Nav.Link>
-                </Nav.Item>
-              ))}
-            </Nav>
-          </div>
-          <LogoutMini />
-        </div> */}
       </Tab.Container>
     </Fragment>
   );

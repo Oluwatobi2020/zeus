@@ -24,12 +24,17 @@ export const AuthProvider = ({ children }) => {
   );
 
   const [isAuthLoading, setIsAuthLoading] = useState();
+  const [refreshTokenCounter, setRefreshTokenCounter] = useState(0);
 
   const token = useRef("");
   const navigate = useNavigate();
 
-  useFetchAuthToken(token);
+  useFetchAuthToken(token, refreshTokenCounter);
   useIdleLogout(userData, signOut);
+
+  const refreshAuthTokenNow = useCallback(() => {
+    setRefreshTokenCounter((prev) => prev + 1);
+  }, []);
 
   function signOut() {
     setUserData(null);
@@ -81,6 +86,7 @@ export const AuthProvider = ({ children }) => {
         userData,
         updateUserData,
         isAuthLoading,
+        refreshAuthTokenNow,
       }}
     >
       {children}

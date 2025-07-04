@@ -1,8 +1,15 @@
+import { useAuth } from "../../context/AuthContext";
 import rainbow from "../../images/rainbow.gif";
 import LoginForm from "./LoginForm";
 import { NavLink } from "react-router-dom";
+import { useEffect } from "react";
 
 function Login() {
+  const { refreshAuthTokenNow } = useAuth();
+
+  useEffect(() => {
+    refreshAuthTokenNow();
+  }, [refreshAuthTokenNow]);
   return (
     <div className="login-account">
       <div className="row h-100">
