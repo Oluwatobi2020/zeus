@@ -84,6 +84,7 @@ function StartConversation() {
                     display: "block",
                     marginBottom: "10px",
                     border: "0",
+                    textTransform: "uppercase",
                   }}
                   key={key}
                   className="custom-button"
