@@ -3,6 +3,9 @@ import remarkGfm from "remark-gfm";
 import { useEffect, useRef } from "react";
 import { useChat } from "../../../../context/ChatContext";
 import { useAuth } from "../../../../context/AuthContext";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import { customSchema } from "../../../../utils/markdownSchema";
 
 function Messages({ messages }) {
   const lastMessageRef = useRef();
@@ -42,6 +45,7 @@ function Messages({ messages }) {
           >
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw, [rehypeSanitize, customSchema]]}
               components={{
                 table: ({ node, ...props }) => (
                   <div style={{ overflowX: "auto" }}>
