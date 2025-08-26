@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export function generateErrorMessages(err) {
+export function generateZeusErrorMessages(err) {
   let errorMessage =
     "Hmm... something unexpected just happened 🤔. Could you please prompt me again? Thank you! – Zeus";
 
